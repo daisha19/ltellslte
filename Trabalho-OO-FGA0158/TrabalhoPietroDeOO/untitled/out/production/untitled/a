@@ -1,0 +1,399 @@
+package app;
+
+import exceptions.CampoEmBrancoException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Turma {
+
+    private String codigo;
+    private String nome;
+    private List<Disciplina> disciplinas;
+    private List<Aluno> alunos;
+    private Professor professor;
+
+    public Turma(String codigo, String nome, Professor professor) throws CampoEmBrancoException {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.professor = professor;
+        this.disciplinas = new ArrayList<>();
+        this.alunos = new ArrayList<>();
+    }
+
+    // Getters
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public List<Disciplina> getDisciplinas() {
+        return disciplinas;
+    }
+
+    public List<Aluno> getAlunos() {
+        return alunos;
+    }
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    // Setters
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
+
+    // Métodos para gerenciar disciplinas e alunos
+    public void adicionarDisciplina(Disciplina d) {
+        disciplinas.add(d);
+    }
+
+    public void removerDisciplina(Disciplina d) {
+        disciplinas.remove(d);
+    }
+
+    public void adicionarAluno(Aluno a) {
+        alunos.add(a);
+    }
+
+    public void removerAluno(Aluno a) {
+        alunos.remove(a);
+    }
+
+    // Imprimir lista de presença
+    public void imprimirListaPresenca() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Código da Turma: ").append(codigo).append("\n");
+        sb.append("Nome da Turma: ").append(nome).append("\n");
+        sb.append("Professor: ").append(professor.getNome()).append("\n");
+
+        sb.append("Disciplinas:\n");
+        for (Disciplina d : disciplinas) {
+            sb.append("  - ").append(d.getNome()).append("\n");
+        }
+
+        sb.append("Lista de Alunos:\n");
+        for (Aluno a : alunos) {
+            sb.append("  Matrícula: ").append(a.getMatricula())
+                    .append(" - Nome: ").append(a.getNome()).append("\n");
+        }
+
+        System.out.println(sb.toString());
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Código da Turma: ").append(codigo).append("\n");
+        sb.append("Nome da Turma: ").append(nome).append("\n");
+        sb.append("Professor: ").append(professor.getNome()).append("\n");
+        sb.append("Disciplinas:\n");
+        for (Disciplina d : disciplinas) {
+            sb.append("  ").append(d.toString()).append("\n");
+        }
+        sb.append("Alunos:\n");
+        for (Aluno a : alunos) {
+            sb.append("  ").append(a.toString()).append("\n");
+        }
+        return sb.toString();
+    }
+}
+
+
+
+
+
+
+
+
+
+package cadastros;
+
+import app.Turma;
+import app.Professor;
+import app.Disciplina;
+import app.Aluno;
+import exceptions.CampoEmBrancoException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class CadastroTurma {
+
+    private Map<String, Turma> turmas;
+
+    public CadastroTurma() {
+        this.turmas = new HashMap<>();
+    }
+
+    public void cadastrarTurma(Turma turma) throws CampoEmBrancoException {
+        if (turma.getCodigo() == null || turma.getCodigo().isBlank()) {
+            throw new CampoEmBrancoException("Código da turma não pode ser vazio.");
+        }
+        if (turma.getNome() == null || turma.getNome().isBlank()) {
+            throw new CampoEmBrancoException("Nome da turma não pode ser vazio.");
+        }
+        if (turma.getProfessor() == null) {
+            throw new CampoEmBrancoException("Professor da turma não pode ser vazio.");
+        }
+
+        turmas.put(turma.getCodigo(), turma);
+    }
+
+    public Turma pesquisarTurma(String codigo) {
+        return turmas.get(codigo);
+    }
+
+    public boolean atualizarTurma(String codigo, Turma novaTurma) throws CampoEmBrancoException {
+        Turma turma = turmas.get(codigo);
+        if (turma != null) {
+            turma.setNome(novaTurma.getNome());
+            turma.setProfessor(novaTurma.getProfessor());
+            turma.getDisciplinas().clear();
+            turma.getDisciplinas().addAll(novaTurma.getDisciplinas());
+            turma.getAlunos().clear();
+            turma.getAlunos().addAll(novaTurma.getAlunos());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removerTurma(Turma turma) {
+        return turmas.remove(turma.getCodigo()) != null;
+    }
+
+    public void adicionarDisciplinaNaTurma(String codigoTurma, Disciplina disciplina) {
+        Turma turma = turmas.get(codigoTurma);
+        if (turma != null) {
+            turma.adicionarDisciplina(disciplina);
+        } else {
+            throw new IllegalArgumentException("Turma não encontrada.");
+        }
+    }
+
+    public void removerDisciplinaDaTurma(String codigoTurma, Disciplina disciplina) {
+        Turma turma = turmas.get(codigoTurma);
+        if (turma != null) {
+            turma.removerDisciplina(disciplina);
+        } else {
+            throw new IllegalArgumentException("Turma não encontrada.");
+        }
+    }
+
+    public void adicionarAlunoNaTurma(String codigoTurma, Aluno aluno) {
+        Turma turma = turmas.get(codigoTurma);
+        if (turma != null) {
+            turma.adicionarAluno(aluno);
+        } else {
+            throw new IllegalArgumentException("Turma não encontrada.");
+        }
+    }
+
+    public void removerAlunoDaTurma(String codigoTurma, Aluno aluno) {
+        Turma turma = turmas.get(codigoTurma);
+        if (turma != null) {
+            turma.removerAluno(aluno);
+        } else {
+            throw new IllegalArgumentException("Turma não encontrada.");
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+package view;
+
+import javax.swing.JOptionPane;
+
+import app.Aluno;
+import app.Turma;
+import app.Professor;
+import app.Disciplina;
+import cadastros.CadastroTurma;
+import cadastros.CadastroDisciplina;
+import cadastros.CadastroProfessor;
+import cadastros.CadastroAluno;
+import exceptions.CampoEmBrancoException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MenuTurma {
+
+    public static Turma dadosNovaTurma(CadastroProfessor cadProfessor, CadastroDisciplina cadDisciplina, CadastroAluno cadAluno) {
+        String codigo = lerCodigo();
+        String nome = lerNome();
+        Professor professor = lerProfessor(cadProfessor);
+        List<Disciplina> disciplinas = lerDisciplinas(cadDisciplina);
+        List<Aluno> alunos = lerAlunos(cadAluno);
+
+        try {
+            Turma turma = new Turma(codigo, nome, professor);
+            for (Disciplina d : disciplinas) {
+                turma.adicionarDisciplina(d);
+            }
+            for (Aluno a : alunos) {
+                turma.adicionarAluno(a);
+            }
+            return turma;
+        } catch (CampoEmBrancoException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
+    private static List<Disciplina> lerDisciplinas(CadastroDisciplina cadDisciplina) {
+        List<Disciplina> disciplinas = new ArrayList<>();
+        String resposta;
+        do {
+            String codigoDisciplina = JOptionPane.showInputDialog("Informe o código da disciplina a ser adicionada (ou 'fim' para terminar): ");
+            if ("fim".equalsIgnoreCase(codigoDisciplina)) {
+                break;
+            }
+            Disciplina disciplina = cadDisciplina.pesquisarDisciplina(codigoDisciplina);
+            if (disciplina != null) {
+                disciplinas.add(disciplina);
+            } else {
+                JOptionPane.showMessageDialog(null, "Disciplina não encontrada.");
+            }
+        } while (true);
+        return disciplinas;
+    }
+
+    private static List<Aluno> lerAlunos(CadastroAluno cadAluno) {
+        List<Aluno> alunos = new ArrayList<>();
+        String resposta;
+        do {
+            String matriculaAluno = JOptionPane.showInputDialog("Informe a matrícula do aluno a ser adicionada (ou 'fim' para terminar): ");
+            if ("fim".equalsIgnoreCase(matriculaAluno)) {
+                break;
+            }
+            Aluno aluno = cadAluno.pesquisarAluno(matriculaAluno);
+            if (aluno != null) {
+                alunos.add(aluno);
+            } else {
+                JOptionPane.showMessageDialog(null, "Aluno não encontrado.");
+            }
+        } while (true);
+        return alunos;
+    }
+
+    private static String lerCodigo() {
+        return JOptionPane.showInputDialog("Informe o código da turma: ");
+    }
+
+    private static String lerNome() {
+        return JOptionPane.showInputDialog("Informe o nome da turma: ");
+    }
+
+    private static Professor lerProfessor(CadastroProfessor cadProfessor) {
+        String matriculaFUB = JOptionPane.showInputDialog("Informe a matrícula FUB do professor: ");
+
+        Professor professor = cadProfessor.pesquisarProfessor(matriculaFUB); // Verifica se o professor está cadastrado
+
+        if (professor != null) {
+            return professor; // Retorna o professor encontrado
+        } else {
+            JOptionPane.showMessageDialog(null, "Professor não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return null; // Retorna null se o professor não for encontrado
+        }
+    }
+    public static void menuTurma(CadastroTurma cadTurma, CadastroProfessor cadProfessor, CadastroDisciplina cadDisciplina, CadastroAluno cadAluno) {
+        String txt = "Informe a opção desejada \n"
+                + "1 - Cadastrar turma\n"
+                + "2 - Pesquisar turma\n"
+                + "3 - Atualizar turma\n"
+                + "4 - Remover turma\n"
+                + "5 - Adicionar aluno\n"
+                + "6 - Remover aluno\n"
+                + "7 - Imprimir lista de presença\n"
+                + "0 - Voltar para menu anterior";
+
+        int opcao = -1;
+        do {
+            String strOpcao = JOptionPane.showInputDialog(txt);
+            opcao = Integer.parseInt(strOpcao);
+
+            switch (opcao) {
+                case 1:
+                    Turma novaTurma = dadosNovaTurma(cadProfessor, cadDisciplina, cadAluno);
+                    if (novaTurma != null) {
+                        try {
+                            cadTurma.cadastrarTurma(novaTurma);
+                            JOptionPane.showMessageDialog(null, "Turma cadastrada com sucesso.");
+                        } catch (CampoEmBrancoException e) {
+                            JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                    break;
+
+                case 2:
+                    String codigo = lerCodigo();
+                    Turma turma = cadTurma.pesquisarTurma(codigo);
+                    if (turma != null) {
+                        JOptionPane.showMessageDialog(null, turma.toString());
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Turma não encontrada.");
+                    }
+                    break;
+
+                case 3:
+                    codigo = lerCodigo();
+                    Turma novaCadastro = dadosNovaTurma(cadProfessor, cadDisciplina, cadAluno);
+                    if (novaCadastro != null) {
+                        try {
+                            boolean atualizado = cadTurma.atualizarTurma(codigo, novaCadastro);
+                            if (atualizado) {
+                                JOptionPane.showMessageDialog(null, "Turma atualizada com sucesso.");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Turma não encontrada.");
+                            }
+                        } catch (CampoEmBrancoException e) {
+                            JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                    break;
+
+                case 4:
+                    codigo = lerCodigo();
+                    Turma remover = cadTurma.pesquisarTurma(codigo);
+                    boolean removido = cadTurma.removerTurma(remover);
+                    if (removido) {
+                        JOptionPane.showMessageDialog(null, "Turma removida do cadastro.");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Turma não encontrada.");
+                    }
+                    break;
+
+                case 5:
+                    codigo = lerCodigo();
+                    turma = cadTurma.pesquisarTurma(codigo);
+                    if (turma != null) {
+                        turma.imprimirListaPresenca();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Turma não encontrada.");
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        } while (opcao != 0);
+    }
+
+
+
+}
